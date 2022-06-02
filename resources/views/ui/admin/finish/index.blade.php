@@ -17,12 +17,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Halaman Produk</h1>
+                    <h1 class="m-0">Halaman Produksi Finish</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Halaman Produk</li>
+                        <li class="breadcrumb-item active">Halaman Produksi Finish</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -38,8 +38,8 @@
                     <div class="card">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
-                                <h3 class="card-title">Data Produk</h3>
-                                <a href="{{ route('admin.product.create') }}" class="btn btn-primary font-weight-bold">
+                                <h3 class="card-title">Data Produksi Finish</h3>
+                                <a href="{{ route('admin.finish.create') }}" class="btn btn-primary font-weight-bold">
                                     <i class="fas fa-plus mr-1"></i>
                                     Tambah
                                 </a>
@@ -51,33 +51,30 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Brand</th>
-                                        <th>Ukuran</th>
-                                        <th>Stok Semifinish</th>
-                                        <th>Stok Finish</th>
-                                        <th>Kebutuhan Inner</th>
+                                        <th>Brand / Ukuran</th>
+                                        <th>Kebutuhan Inner / Jumlah</th>
+                                        <th>Kebutuhan Master</th>
+                                        <th>Total Masuk</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($products as $product)
+                                    @foreach ($finishes as $item)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $product->brand->name }}</td>
-                                        <td>{{ $product->size }}</td>
-                                        <td>{{ $product->stock_semifinish }}</td>
-                                        <td>{{ $product->stock_finish }}</td>
-                                        <td>{{ $product->need_inner }}</td>
+                                        <td>{{ $item->product->brand->name . ' / ' . $item->product->size }}</td>
+                                        <td>{{ $item->inner->name . ' / ' . $item->need_inner }}</td>
+                                        <td>{{ $item->master->name . ' / ' . $item->total }}</td>
+                                        <td>{{ $item->total }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <th>No</th>
-                                        <th>Brand</th>
-                                        <th>Ukuran</th>
-                                        <th>Stok Semifinish</th>
-                                        <th>Stok Finish</th>
-                                        <th>Kebutuhan Inner</th>
+                                        <th>Brand / Ukuran</th>
+                                        <th>Kebutuhan Inner / Jumlah</th>
+                                        <th>Kebutuhan Master</th>
+                                        <th>Total Masuk</th>
                                     </tr>
                                 </tfoot>
                             </table>

@@ -15,7 +15,7 @@
                     alt="User Image">
             </div>
             <div class="info">
-                <a href="#" class="d-block">Doni Salaman</a>
+                <a href="#" class="d-block">{{ Auth::user()->name }}</a>
             </div>
         </div>
 
@@ -108,6 +108,26 @@
                         </p>
                     </a>
                 </li>
+                <li class="nav-header pt-4">PROSES PRODUKSI</li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.semifinish.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.semifinish.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-star-half-alt"></i>
+                        <p>
+                            Semifinish
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.finish.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.finish.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-star"></i>
+                        <p>
+                            Finish
+                        </p>
+                    </a>
+                </li>
+                <div class="pt-5"></div>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

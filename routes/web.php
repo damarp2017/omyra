@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\FinishController;
 use App\Http\Controllers\Admin\MaterialController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\SemifinishController;
 use App\Http\Controllers\Admin\StockInnerController;
 use App\Http\Controllers\Admin\StockMasterController;
 use App\Http\Controllers\Admin\StockPlasticController;
@@ -67,6 +69,16 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
             Route::get('create', [StockMasterController::class, 'create'])->name('admin.stock.master.create');
             Route::post('store', [StockMasterController::class, 'store'])->name('admin.stock.master.store');
         });
+    });
+    Route::prefix('semifinish')->group(function () {
+        Route::get('index', [SemifinishController::class, 'index'])->name('admin.semifinish.index');
+        Route::get('create', [SemifinishController::class, 'create'])->name('admin.semifinish.create');
+        Route::post('store', [SemifinishController::class, 'store'])->name('admin.semifinish.store');
+    });
+    Route::prefix('finish')->group(function () {
+        Route::get('index', [FinishController::class, 'index'])->name('admin.finish.index');
+        Route::get('create', [FinishController::class, 'create'])->name('admin.finish.create');
+        Route::post('store', [FinishController::class, 'store'])->name('admin.finish.store');
     });
 });
 
