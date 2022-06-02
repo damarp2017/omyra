@@ -29,7 +29,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-Route::group(['prefix' => 'admin'], function () {
+Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], function () {
     Route::get('', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::prefix('user')->group(function () {
         Route::get('index', [UserController::class, 'index'])->name('admin.user.index');
