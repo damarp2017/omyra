@@ -76,7 +76,7 @@
                     <div class="col-sm">
                         <div class="card mb-1px shadow-lg"
                             style="border-radius: 50px; box-shadow: 3px 3px 20px 2px rgba(128, 128, 128, 0.322);">
-                            <a href="">
+                            <a href="{{ route('frontend.report.plastic.index') }}">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-center">
                                         <img src="{{ asset('images/icon/plastic.png') }}" alt="" height="50" width="50">

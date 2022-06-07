@@ -18,6 +18,7 @@ use App\Http\Controllers\Frontend\MasterController;
 use App\Http\Controllers\Frontend\NotificationController;
 use App\Http\Controllers\Frontend\PlasticController;
 use App\Http\Controllers\Frontend\ProfileController;
+use App\Http\Controllers\Frontend\ReportPlasticController;
 use App\Http\Controllers\Frontend\SemiFinishController as FrontendSemiFinishController;
 use Illuminate\Support\Facades\Route;
 
@@ -138,6 +139,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('create', [FrontendFinishController::class, 'create'])->name('frontend.finish.create');
         Route::post('store', [FrontendFinishController::class, 'store'])->name('frontend.finish.store');
         Route::delete('{id}', [FrontendFinishController::class, 'destroy'])->name('frontend.finish.delete');
+    });
+
+    Route::prefix('report')->group(function () {
+        Route::get('/plastic', [ReportPlasticController::class, 'index'])->name('frontend.report.plastic.index');
     });
 });
 
