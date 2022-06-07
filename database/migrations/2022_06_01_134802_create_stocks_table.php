@@ -16,6 +16,7 @@ class CreateStocksTable extends Migration
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('material_id')->unsigned();
+            $table->date('date');
             $table->integer('total');
             $table->foreignId('user_id')->unsigned();
             $table->timestamps();

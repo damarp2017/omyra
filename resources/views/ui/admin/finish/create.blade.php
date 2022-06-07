@@ -121,7 +121,7 @@
 <script>
     $(function () {
         let need_inner = 0, max_inner = 0, max_master = 0, max_stock_semifinish = 0, max_total = 0;
-        
+
         function setMaxInner(param) {
             max_inner = param/need_inner;
         }
@@ -149,14 +149,14 @@
                 $('#total').attr('disabled', false);
             }
         }
-        
+
         $('.select2').select2({
             theme: 'bootstrap4'
         });
 
         $('#form-tambah').validate({
             rules: {
-                unloading_date: {
+                date: {
                     required: true,
                 },
                 product: {
@@ -173,8 +173,8 @@
                 },
             },
             messages: {
-                unloading_date: {
-                    required: "Mohon masukan tanggal bongkar oven",
+                date: {
+                    required: "Mohon masukan tanggal stuffing",
                 },
                 product: {
                     required: "Mohon pilih brand / ukuran",
@@ -211,7 +211,7 @@
                 success: function (response) {
                     let html = ``;
                     html +=
-                        `<option value="" selected="selected" disabled>-- Pilih Material Inner --</option>`;
+                        `<option value="" selected="selected" disabled>-- Pilih Jenis Inner --</option>`;
                     response.materials.forEach(material => {
                         html +=
                             `<option value="${ material.id }">${ material.name } | stock: ${material.stock}</option>`;
@@ -239,7 +239,7 @@
                 success: function (response) {
                     let html = ``;
                     html +=
-                        `<option value="" selected="selected" disabled>-- Pilih Material Master --</option>`;
+                        `<option value="" selected="selected" disabled>-- Pilih Jenis Master --</option>`;
                     response.materials.forEach(material => {
                         html +=
                             `<option value="${ material.id }">${ material.name } | stock: ${material.stock}</option>`;
@@ -263,7 +263,7 @@
                         // $('#need_inner').attr('max', material.stock);
                         setMaxInner(material.stock);
                         setGreatestNumber(max_inner, max_master, max_stock_semifinish);
-                    } 
+                    }
                 }
             });
             checkAllField();
@@ -280,7 +280,7 @@
                     if (material != null) {
                         setMaxMaster(material.stock);
                         setGreatestNumber(max_inner, max_master, max_stock_semifinish);
-                    } 
+                    }
                 }
             });
             checkAllField();
@@ -299,7 +299,7 @@
                     $('#need_inner').val(total * (product.need_inner ?? 0));
                 }
             });
-        }); 
+        });
 
     });
 </script>

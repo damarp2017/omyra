@@ -19,6 +19,7 @@ class CreateFinishesTable extends Migration
             $table->foreignId('inner_id')->unsigned();
             $table->integer('need_inner')->default(0);
             $table->foreignId('master_id')->unsigned();
+            $table->date('date');
             $table->integer('total')->default(0);
             $table->foreignId('user_id')->unsigned();
             $table->timestamps();

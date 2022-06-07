@@ -55,6 +55,7 @@
                                         <th>Nama Material</th>
                                         <th>Kategori</th>
                                         <th>Stok</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -66,6 +67,18 @@
                                         <td>{{ $material->name }}</td>
                                         <td>{{ Str::title($material->type) }}</td>
                                         <td>{{ $material->stock }}</td>
+                                        <td>
+                                            <a href="#" class="btn btn-sm btn-info"><i
+                                                    class="fa fa-edit"></i></a>
+                                            <form id="delete-material"
+                                                action="{{ route('admin.material.delete', $material->id) }}"
+                                                class="d-inline" method="POST">
+                                                @csrf
+                                                @method('delete')
+                                                <button id="btn-delete" class="btn btn-sm btn-danger"><i
+                                                        class="fa fa-trash"></i></button>
+                                            </form>
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -76,6 +89,7 @@
                                         <th>Nama Material</th>
                                         <th>Kategori</th>
                                         <th>Stok</th>
+                                        <th>Action</th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -116,6 +130,23 @@
             "autoWidth": false,
             "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
         }).buttons().container().appendTo('#table-data_wrapper .col-md-6:eq(0)');
+
+        $('#btn-delete').on('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Are you sure ?',
+                text: "You won't be able to revert this !",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('form#delete-material').submit();
+                }
+            })
+        });
     });
 
 </script>

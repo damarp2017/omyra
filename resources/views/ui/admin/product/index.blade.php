@@ -56,6 +56,7 @@
                                         <th>Stok Semifinish</th>
                                         <th>Stok Finish</th>
                                         <th>Kebutuhan Inner</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -67,6 +68,18 @@
                                         <td>{{ $product->stock_semifinish }}</td>
                                         <td>{{ $product->stock_finish }}</td>
                                         <td>{{ $product->need_inner }}</td>
+                                        <td>
+                                            <a href="#" class="btn btn-sm btn-info"><i
+                                                    class="fa fa-edit"></i></a>
+                                            <form id="delete-product"
+                                                action="{{ route('admin.product.delete', $product->id) }}"
+                                                class="d-inline" method="POST">
+                                                @csrf
+                                                @method('delete')
+                                                <button id="btn-delete" class="btn btn-sm btn-danger"><i
+                                                        class="fa fa-trash"></i></button>
+                                            </form>
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -78,6 +91,7 @@
                                         <th>Stok Semifinish</th>
                                         <th>Stok Finish</th>
                                         <th>Kebutuhan Inner</th>
+                                        <th>Action</th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -118,6 +132,23 @@
             "autoWidth": false,
             "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
         }).buttons().container().appendTo('#table-data_wrapper .col-md-6:eq(0)');
+
+        $('#btn-delete').on('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Are you sure ?',
+                text: "You won't be able to revert this !",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('form#delete-product').submit();
+                }
+            })
+        });
     });
 
 </script>

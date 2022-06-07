@@ -36,4 +36,11 @@ class ProductController extends Controller
         $product->save();
         return redirect()->route('admin.product.index')->with(['success' => 'Data baru berhasil ditambahkan.']);
     }
+
+    public function destroy($id)
+    {
+        $product = Product::where('id', $id)->first();
+        $product->delete();
+        return redirect()->route('admin.product.index')->with(['success' => 'Berhasil menghapus data.']);
+    }
 }

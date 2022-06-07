@@ -12,7 +12,7 @@ class MaterialController extends Controller
 {
     public function index()
     {
-        $materials = Materials::orderBy('id', 'DESC')->get();
+        $materials = Materials::orderBy('id', 'DESC')->paginate('10');
         return view('ui.admin.material.index', [
             'materials' => $materials,
         ]);
@@ -35,5 +35,13 @@ class MaterialController extends Controller
         $material->user_id = Auth::user()->id;
         $material->save();
         return redirect()->route('admin.material.index')->with(['success' => 'Data baru berhasil ditambahkan.']);
+    }
+
+    public function destroy($id)
+    {
+        $material = Materials::where('id', $id)->first();
+        // dd($material);
+        $material->delete();
+        return redirect()->route('admin.material.index')->with(['success' => 'Berhasil menghapus data.']);
     }
 }

@@ -35,6 +35,7 @@ class SemifinishController extends Controller
         $semifinish = new Semifinish();
         $semifinish->product_id = $request->product;
         $semifinish->material_id = $request->material;
+        $semifinish->date = Carbon::createFromFormat('d-m-Y', $request->date)->format('Y-m-d');
         $semifinish->unloading_date = Carbon::createFromFormat('d/m/Y', $request->unloading_date)->format('Y-m-d');
         $semifinish->total = $request->total;
         $semifinish->user_id = Auth::user()->id;

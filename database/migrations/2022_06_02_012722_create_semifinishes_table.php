@@ -17,6 +17,7 @@ class CreateSemifinishesTable extends Migration
             $table->id();
             $table->foreignId('product_id')->unsigned();
             $table->foreignId('material_id')->unsigned();
+            $table->date('date');
             $table->date('unloading_date');
             $table->integer('total')->default(0);
             $table->foreignId('user_id')->unsigned();

@@ -31,4 +31,11 @@ class BrandController extends Controller
         $brand->save();
         return redirect()->route('admin.brand.index')->with(['success' => 'Data baru berhasil ditambahkan.']);
     }
+
+    public function destroy($id)
+    {
+        $brand = Brand::where('id', $id)->first();
+        $brand->delete();
+        return redirect()->route('admin.brand.index')->with(['success' => 'Berhasil menghapus data.']);
+    }
 }
