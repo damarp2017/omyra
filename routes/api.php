@@ -30,3 +30,13 @@ Route::get('product/master/{id}', [MasterController::class, 'getMaster'])->name(
 
 Route::get('material/{id}', [MaterialController::class, 'show'])->name('api.show.material');
 Route::get('product/{id}', [ProductController::class, 'show'])->name('api.show.product');
+
+Route::get('stock/brand-product-material', function () {
+    return response()->json([
+        'status' => 'success',
+        'data' => [
+            'products' => \App\Models\Product::all(),
+            'materials' => \App\Models\Materials::all(),
+        ]
+    ]);
+});

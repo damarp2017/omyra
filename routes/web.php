@@ -56,18 +56,24 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
         Route::get('index', [BrandController::class, 'index'])->name('admin.brand.index');
         Route::get('create', [BrandController::class, 'create'])->name('admin.brand.create');
         Route::post('store', [BrandController::class, 'store'])->name('admin.brand.store');
+        Route::get('edit/{id}', [BrandController::class, 'edit'])->name('admin.brand.edit');
+        Route::put('edit/{id}', [BrandController::class, 'update'])->name('admin.brand.update');
         Route::delete('{id}', [BrandController::class, 'destroy'])->name('admin.brand.delete');
     });
     Route::prefix('product')->group(function () {
         Route::get('index', [ProductController::class, 'index'])->name('admin.product.index');
         Route::get('create', [ProductController::class, 'create'])->name('admin.product.create');
         Route::post('store', [ProductController::class, 'store'])->name('admin.product.store');
+        Route::get('edit/{id}', [ProductController::class, 'edit'])->name('admin.product.edit');
+        Route::put('edit/{id}', [ProductController::class, 'update'])->name('admin.product.update');
         Route::delete('{id}', [ProductController::class, 'destroy'])->name('admin.product.delete');
     });
     Route::prefix('material')->group(function () {
         Route::get('index', [MaterialController::class, 'index'])->name('admin.material.index');
         Route::get('create', [MaterialController::class, 'create'])->name('admin.material.create');
         Route::post('store', [MaterialController::class, 'store'])->name('admin.material.store');
+        Route::get('edit/{id}', [MaterialController::class, 'edit'])->name('admin.material.edit');
+        Route::put('edit/{id}', [MaterialController::class, 'update'])->name('admin.material.update');
         Route::delete('{id}', [MaterialController::class, 'destroy'])->name('admin.material.delete');
     });
     Route::prefix('stock')->group(function () {
@@ -143,6 +149,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::prefix('report')->group(function () {
         Route::get('/plastic', [ReportPlasticController::class, 'index'])->name('frontend.report.plastic.index');
+        Route::any('/plastic/data', [ReportPlasticController::class, 'data'])->name('frontend.report.plastic.data');
     });
 });
 

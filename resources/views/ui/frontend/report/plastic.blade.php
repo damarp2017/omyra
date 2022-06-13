@@ -1,10 +1,35 @@
 @extends('ui.frontend.layouts.app')
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap-multiselect/bootstrap-multiselect.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/multi-select/css/multi-select.css') }}">
     <style>
         .select2-container .select2-selection--single {
             height: 42px;
             border: solid 1px #b4d5ff;
+        }
+
+        .input-filter {
+            border-radius: 4px !important;
+            direction: ltr !important;
+            padding: 5px !important;
+            font-size: 12px !important;
+        }
+
+        .multiselect_div>.btn-group .btn {
+            min-width: 150px;
+            font-size: 12px;
+            border: 1px solid black;
+            background: white;
+            color: black;
+        }
+
+        .multiselect_div .btn-group .multiselect-container {
+            font-size: 12px !important;
+        }
+
+        tfoot {
+            background: white;
         }
     </style>
 @endpush
@@ -28,18 +53,28 @@
                 @csrf
                 <div class="form-group">
                     <label class="font-weight-500">Brand / Ukuran</label>
-                    <select class="select2 form-control font-size-16 form-omyra" id="product" name="product">
-                        <option selected disabled>-- Pilih Brand / Ukuran --</option>
-                        <option value="test">ALDUCHAN / 1 KG</option>
-                        <option value="test">BABYLON / 2 KG</option>
+                    <select
+                        class="select2 form-control font-size-16 form-omyra product-plastic {{ $errors->has('product') ? 'is-invalid' : '' }}"
+                        id="product" name="product">
+                        <option selected disabled>Pilih Brand / Ukuran</option>
+                        @foreach ($products as $product)
+                            <option value="{{ $product->id }}">
+                                {{ $product->brand->name . ' / ' . $product->size }}
+                            </option>
+                        @endforeach
+                        @if ($errors->has('product'))
+                            <span class="invalid-feedback" role="alert">
+                                <p><b>{{ $errors->first('product') }}</b></p>
+                            </span>
+                        @endif
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="font-weight-500">Jenis Plastik</label>
-                    <select class="select2 form-control font-size-16 form-omyra" name="product">
-                        <option selected disabled>-- Pilih Jenis Plastik --</option>
-                        <option value="test">ALDUCHAN / 1 KG</option>
-                        <option value="test">BABYLON / 2 KG</option>
+                    <label class="font-weight-500">Jenis</label>
+                    <select
+                        class="select2 form-control font-size-16 form-omyra material-plastic {{ $errors->has('material') ? 'is-invalid' : '' }}"
+                        id="material" name="material">
+                        <option selected="selected" disabled>-- Pilih Brand / Ukuran Dulu --</option>
                     </select>
                 </div>
                 <button class="btn btn-sm btn-info float-right" type="submit">Submit</button>
@@ -69,25 +104,54 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    {{-- <tr>
                         <td>1</td>
                         <td>1</td>
                         <td>1</td>
                         <td>1</td>
                         <td>1</td>
                         <td>1</td>
-                    </tr>
+                    </tr> --}}
                 </tbody>
-                <tfoot>
+                {{-- <tfoot>
                     <tr>
-                        <th>No</th>
-                        <th>Tanggal</th>
-                        <th>Brand / Ukuran</th>
-                        <th>Jenis</th>
-                        <th>Jumlah Masuk</th>
-                        <th>Action</th>
+                        <th><input type="text" class="input-filter w-50px" name="stock_id"></th>
+                        <th><input type="text" class="input-filter w-50px" name="date"></th>
+                        <th>
+                            <div class="multiselect_div">
+                                <select name="products" id="multiselect4-filter"
+                                    class="multiselect multiselect-custom input-filter">
+                                    @php
+                                        $products = \App\Models\Product::all();
+                                    @endphp
+                                    <option value="">All </option>
+                                    @foreach ($products as $item)
+                                        <option value="{{ $item->id }}">{{ $item->brand->name }} /
+                                            {{ $item->size }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="multiselect_div">
+                                <select name="material" id="multiselect5-filter"
+                                    class="multiselect multiselect-custom input-filter">
+                                    @php
+                                        $materials = \App\Models\Materials::where('type', 'plastic')->get();
+                                    @endphp
+                                    <option value="">All </option>
+                                    @foreach ($materials as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </th>
+                        <th><input type="text" class="input-filter" name="total"></th>
+                        <th></th>
                     </tr>
-                </tfoot>
+
+                </tfoot> --}}
             </table>
         </div>
     </div>
@@ -98,14 +162,105 @@
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="{{ asset('vendor/multi-select/js/jquery.multi-select.js') }}"></script><!-- Multi Select Plugin Js -->
+    <script src="{{ asset('vendor/bootstrap-multiselect/bootstrap-multiselect.js') }}"></script>
     <script>
         $(function() {
-            $('#dataTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'print'
-                ]
+            // $('#dataTable').DataTable();
+
+            let list_stock_plastic = [];
+            let product = $("#filter-product").val(),
+                brand = $("#filter-brand").val(),
+                material = $("#filter-material").val()
+
+            const table = $('#dataTable').DataTable({
+                "pageLength": 100,
+                "lengthMenu": [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, 'semua']
+                ],
+                "bLengthChange": true,
+                "bFilter": true,
+                "bInfo": true,
+                "processing": true,
+                "bServerSide": true,
+                "order": [
+                    [1, "desc"]
+                ],
+                "autoWidth": false,
+                "ajax": {
+                    url: "{{ url('') }}/report/plastic/data",
+                    // type: "post",
+                    data: function(d) {
+                        d.brand = brand;
+                        d.product = product;
+                        d.material = material;
+                        return d
+                    }
+                },
             });
+
+            // if ($('#dataTable').length) {
+            //     let url = '/report/plastic';
+            //     let rowData = [{
+            //             data: 'id',
+            //             name: 'id'
+            //         },
+            //         {
+            //             data: 'date',
+            //             name: 'date'
+            //         },
+            //         {
+            //             data: 'product',
+            //             name: 'product'
+            //         },
+            //         {
+            //             data: 'material',
+            //             name: 'material'
+            //         },
+            //         {
+            //             data: 'total',
+            //             name: 'total'
+            //         },
+            //         {
+            //             data: 'action',
+            //             name: 'action',
+            //             orderable: false,
+            //             sortable: false
+            //         },
+            //     ];
+            //     table = $("#dataTable").DataTable({
+            //         dom: 'Brtp',
+            //         searching: false,
+            //         paging: true,
+            //         responsive: false,
+            //         autoWidth: false,
+            //         bPaginate: true,
+            //         processing: true,
+            //         serverSide: true,
+            //         order: [0, 'desc'],
+            //         oLanguage: {
+            //             oPaginate: {
+            //                 sNext: '<span class="pagination-fa"><i class="fa fa-chevron-right" ></i></span>',
+            //                 sPrevious: '<span class="pagination-fa"><i class="fa fa-chevron-left" ></i></span>'
+            //             }
+            //         },
+            //         ajax: {
+            //             url: url,
+            //             data: function(d) {
+            //                 d.id = $('input[name=stock_id]').val()
+            //                 d.date = $('input[name=date]').val()
+            //                 d.product = $('select[name=products]').val()
+            //                 d.material = $('select[name=material]').val()
+            //                 d.total = $('input[name=total]').val()
+            //             },
+            //         },
+            //         columns: rowData
+            //     });
+            // }
+            $('.input-filter').on('keyup change', function() {
+                table.draw();
+            })
             $('#print-all').click(printAll);
 
             $('#btn-delete').on('click', function(e) {
@@ -130,23 +285,42 @@
         function printAll() {
             $('#dataTable_wrapper .buttons-print').click();
         }
-    </script>
-    {{-- Display success message --}}
-    @if ($message = Session::get('success'))
-        <script>
-            $(function() {
-                let Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2500
-                });
-                Toast.fire({
-                    icon: 'success',
-                    title: '{{ $message }}'
-                });
+        $('.product-plastic').on('change', function() {
+            let productId = $(this).val();
+            $.ajax({
+                type: "GET",
+                url: "{{ route('api.get_plastic.by.product_id', '') }}" + '/' + productId,
+                dataType: "json",
+                success: function(response) {
+                    let html = ``;
+                    html +=
+                        `<option selected="selected" disabled>-- Pilih Jenis Plastik --</option>`;
+                    response.materials.forEach(material => {
+                        html +=
+                            `<option value="${ material.id }">${ material.name } | stock: ${material.stock}</option>`;
+                    });
+                    $('#material').html(html);
+                }
             });
-        </script>
-    @endif
-    {{-- End Display success message --}}
+        });
+
+        $('.material-plastic').on('change', function() {
+            let materialId = $(this).val();
+            $.ajax({
+                type: "GET",
+                url: "{{ route('api.show.material', '') }}" + '/' + materialId,
+                dataType: "json",
+                success: function(response) {
+                    let material = response.material;
+                    console.log(typeof(material.stock));
+                    if (material != null) {
+                        $('#max-label').html('Max: ' + material.stock);
+                        $('#total').attr('max', material.stock);
+                    } else {
+                        $('#max-label').html('');
+                    }
+                }
+            });
+        });
+    </script>
 @endpush
