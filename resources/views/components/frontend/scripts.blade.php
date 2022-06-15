@@ -14,14 +14,29 @@ crossorigin="anonymous"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{{ asset('assets/swiper@7/swiper-bundle.min.js') }}"></script>
 
 <script>
     $(document).ready(function() {
-        $('#example').DataTable();
         $('.select2').select2();
         $('#preloader-active').delay(300).fadeOut('slow');
         $('body').delay(300).css({
             'overflow': 'visible'
+        });
+        const swiper = new Swiper('.swiper', {
+            loop: true,
+            autoplay: {
+                    delay: 3000
+                },
+            effect: 'fade',
+            fadeEffect: {
+                    crossFade: true
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                type: 'bullets',
+                clickable: true
+            },
         });
     });
 </script>
