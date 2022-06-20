@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FinishController;
 use App\Http\Controllers\Admin\MaterialController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ReminderController;
 use App\Http\Controllers\Admin\SemifinishController;
 use App\Http\Controllers\Admin\StockInnerController;
 use App\Http\Controllers\Admin\StockMasterController;
@@ -18,7 +19,11 @@ use App\Http\Controllers\Frontend\MasterController;
 use App\Http\Controllers\Frontend\NotificationController;
 use App\Http\Controllers\Frontend\PlasticController;
 use App\Http\Controllers\Frontend\ProfileController;
+use App\Http\Controllers\Frontend\ReportFinishController;
+use App\Http\Controllers\Frontend\ReportInnerController;
+use App\Http\Controllers\Frontend\ReportMasterController;
 use App\Http\Controllers\Frontend\ReportPlasticController;
+use App\Http\Controllers\Frontend\ReportSemifinishController;
 use App\Http\Controllers\Frontend\SemiFinishController as FrontendSemiFinishController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,7 +48,7 @@ use Illuminate\Support\Facades\Route;
 
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login/submit', [LoginController::class, 'login'])->name('login.submit');
-    Route::get('/login/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/login/logout', [LoginController::class, 'logout'])->name('logout.submit');
 
 Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], function () {
     Route::get('', [DashboardController::class, 'index'])->name('admin.dashboard');
@@ -75,6 +80,14 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
         Route::get('edit/{id}', [MaterialController::class, 'edit'])->name('admin.material.edit');
         Route::put('edit/{id}', [MaterialController::class, 'update'])->name('admin.material.update');
         Route::delete('{id}', [MaterialController::class, 'destroy'])->name('admin.material.delete');
+    });
+    Route::prefix('reminder')->group(function () {
+        Route::get('index', [ReminderController::class, 'index'])->name('admin.reminder.index');
+        Route::get('create', [ReminderController::class, 'create'])->name('admin.reminder.create');
+        Route::post('store', [ReminderController::class, 'store'])->name('admin.reminder.store');
+        Route::get('edit/{id}', [ReminderController::class, 'edit'])->name('admin.reminder.edit');
+        Route::put('edit/{id}', [ReminderController::class, 'update'])->name('admin.reminder.update');
+        Route::delete('{id}', [ReminderController::class, 'destroy'])->name('admin.reminder.delete');
     });
     Route::prefix('stock')->group(function () {
         Route::prefix('plastic')->group(function () {
@@ -149,8 +162,20 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::prefix('report')->group(function () {
         Route::get('/plastic', [ReportPlasticController::class, 'index'])->name('frontend.report.plastic.index');
-        Route::any('/plastic/data', [ReportPlasticController::class, 'data'])->name('frontend.report.plastic.data');
+        Route::post('/plastic/data', [ReportPlasticController::class, 'data'])->name('frontend.report.plastic.data');
+
+        Route::get('/inner', [ReportInnerController::class, 'index'])->name('frontend.report.inner.index');
+        Route::post('/inner/data', [ReportInnerController::class, 'data'])->name('frontend.report.inner.data');
+
+        Route::get('/master', [ReportMasterController::class, 'index'])->name('frontend.report.master.index');
+        Route::post('/master/data', [ReportMasterController::class, 'data'])->name('frontend.report.master.data');
+
+        Route::get('/semifinish', [ReportSemifinishController::class, 'index'])->name('frontend.report.semifinish.index');
+        Route::post('/semifinish/data', [ReportSemifinishController::class, 'data'])->name('frontend.report.semifinish.data');
+
+        Route::get('/finish', [ReportFinishController::class, 'index'])->name('frontend.report.finish.index');
+        Route::post('/finish/data', [ReportFinishController::class, 'data'])->name('frontend.report.finish.data');
     });
 });
 
-// require __DIR__ . '/auth.php';
+require __DIR__ . '/auth.php';

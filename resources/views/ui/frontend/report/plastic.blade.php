@@ -1,8 +1,8 @@
 @extends('ui.frontend.layouts.app')
 @push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
+    {{-- <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap-multiselect/bootstrap-multiselect.css') }}">
-    <link rel="stylesheet" href="{{ asset('vendor/multi-select/css/multi-select.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/multi-select/css/multi-select.css') }}"> --}}
     <style>
         .select2-container .select2-selection--single {
             height: 42px;
@@ -37,7 +37,7 @@
     <div class="box-shadow">
         <div class="col-12 shadow-lg">
             <div class="py-3">
-                <a href="#">
+                <a href="{{ route('frontend.dashboard.index') }}">
                     <img src="{{ asset('images/icon/back.png') }}" width="18" height="18">
                 </a>
             </div>
@@ -49,39 +49,47 @@
     <div class="bg-grey pt-23 mt-1" style="max-height: 86vh; overflow: scroll;">
         {{-- @include('components.frontend.flashmessage') --}}
         <div class="container-omyra" style="margin-bottom: 90px;">
-            <form action="#" method="POST" enctype="multipart/form-data" id="form-tambah">
+            <form action="#" method="POST" enctype="multipart/form-data" id="form-filter">
                 @csrf
                 <div class="form-group">
-                    <label class="font-weight-500">Brand / Ukuran</label>
+                    <label class="font-weight-500">Brand</label>
                     <select
-                        class="select2 form-control font-size-16 form-omyra product-plastic {{ $errors->has('product') ? 'is-invalid' : '' }}"
-                        id="product" name="product">
-                        <option selected disabled>Pilih Brand / Ukuran</option>
-                        @foreach ($products as $product)
-                            <option value="{{ $product->id }}">
-                                {{ $product->brand->name . ' / ' . $product->size }}
+                        class="select2 form-control font-size-16 form-omyra brand-plastic {{ $errors->has('brand') ? 'is-invalid' : '' }}"
+                        id="filter-brand" name="brand">
+                        <option selected disabled>-- Pilih Brand --</option>
+                        @foreach ($brands as $brand)
+                            <option value="{{ $brand->id }}">
+                                {{ $brand->name }}
                             </option>
                         @endforeach
-                        @if ($errors->has('product'))
+                        @if ($errors->has('brand'))
                             <span class="invalid-feedback" role="alert">
-                                <p><b>{{ $errors->first('product') }}</b></p>
+                                <p><b>{{ $errors->first('brand') }}</b></p>
                             </span>
                         @endif
                     </select>
                 </div>
                 <div class="form-group">
+                    <label class="font-weight-500">Jenis / Ukuran </label>
+                    <select
+                        class="select2 form-control font-size-16 form-omyra product-plastic {{ $errors->has('product') ? 'is-invalid' : '' }}"
+                        id="filter-material" name="product">
+                        <option selected disabled>-- Pilih Brand Dulu --</option>
+                    </select>
+                </div>
+                {{-- <div class="form-group">
                     <label class="font-weight-500">Jenis</label>
                     <select
                         class="select2 form-control font-size-16 form-omyra material-plastic {{ $errors->has('material') ? 'is-invalid' : '' }}"
-                        id="material" name="material">
-                        <option selected="selected" disabled>-- Pilih Brand / Ukuran Dulu --</option>
+                        id="filter-material" name="material">
+                        <option selected="selected" disabled>-- Pilih Ukuran Dulu --</option>
                     </select>
-                </div>
-                <button class="btn btn-sm btn-info float-right" type="submit">Submit</button>
-                <a class="btn btn-sm btn-outline-secondary" href="#">Reset</a>
+                </div> --}}
+                <button class="btn btn-sm btn-info float-right mb-5" type="submit">Submit</button>
+                {{-- <a class="btn btn-sm btn-outline-secondary reset-btn" href="#">Reset</a> --}}
             </form>
             {{-- <h5 class="py-3"></h5> --}}
-            <hr>
+            {{-- <hr>
             <div class="py-3 d-flex justify-content-center">
                 <a href="#" class="btn btn-sm btn-success mr-3">
                     <i class="fas fa-download"></i>
@@ -91,218 +99,111 @@
                     <i class="fa fa-print"></i>
                     Print
                 </button>
-            </div>
-            <table id="dataTable" class="table table-striped table-bordered" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Tanggal</th>
-                        <th>Brand / Ukuran</th>
-                        <th>Jenis</th>
-                        <th>Jumlah Masuk</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{-- <tr>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                        <td>1</td>
-                    </tr> --}}
-                </tbody>
-                {{-- <tfoot>
-                    <tr>
-                        <th><input type="text" class="input-filter w-50px" name="stock_id"></th>
-                        <th><input type="text" class="input-filter w-50px" name="date"></th>
-                        <th>
-                            <div class="multiselect_div">
-                                <select name="products" id="multiselect4-filter"
-                                    class="multiselect multiselect-custom input-filter">
-                                    @php
-                                        $products = \App\Models\Product::all();
-                                    @endphp
-                                    <option value="">All </option>
-                                    @foreach ($products as $item)
-                                        <option value="{{ $item->id }}">{{ $item->brand->name }} /
-                                            {{ $item->size }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="multiselect_div">
-                                <select name="material" id="multiselect5-filter"
-                                    class="multiselect multiselect-custom input-filter">
-                                    @php
-                                        $materials = \App\Models\Materials::where('type', 'plastic')->get();
-                                    @endphp
-                                    <option value="">All </option>
-                                    @foreach ($materials as $item)
-                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </th>
-                        <th><input type="text" class="input-filter" name="total"></th>
-                        <th></th>
-                    </tr>
-
-                </tfoot> --}}
-            </table>
+            </div> --}}
+            <table id="main-table" class="table table-striped table-bordered" style="width:100%"></table>
         </div>
     </div>
 @endsection
 
 @push('scripts')
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="{{ asset('vendor/multi-select/js/jquery.multi-select.js') }}"></script><!-- Multi Select Plugin Js -->
-    <script src="{{ asset('vendor/bootstrap-multiselect/bootstrap-multiselect.js') }}"></script>
+    {{-- <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script> --}}
+    {{-- <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> --}}
+    {{-- <script src="{{ asset('vendor/multi-select/js/jquery.multi-select.js') }}"></script><!-- Multi Select Plugin Js -->
+    <script src="{{ asset('vendor/bootstrap-multiselect/bootstrap-multiselect.js') }}"></script> --}}
     <script>
         $(function() {
             // $('#dataTable').DataTable();
 
             let list_stock_plastic = [];
-            let product = $("#filter-product").val(),
-                brand = $("#filter-brand").val(),
-                material = $("#filter-material").val()
 
-            const table = $('#dataTable').DataTable({
-                "pageLength": 100,
-                "lengthMenu": [
-                    [10, 25, 50, 100, -1],
-                    [10, 25, 50, 100, 'semua']
-                ],
-                "bLengthChange": true,
-                "bFilter": true,
-                "bInfo": true,
-                "processing": true,
-                "bServerSide": true,
-                "order": [
-                    [1, "desc"]
-                ],
-                "autoWidth": false,
+
+            const table = $('#main-table').DataTable({
+				"destroy": true,
+				"pageLength": 10,
+				"processing": true,
+				"serverSide": true,
                 "ajax": {
                     url: "{{ url('') }}/report/plastic/data",
-                    // type: "post",
+					headers: { 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    type: "post",
                     data: function(d) {
-                        d.brand = brand;
-                        d.product = product;
-                        d.material = material;
-                        return d
+                        d.brand = $("#filter-brand").val()
+                        d.product = $("#filter-product").val()
+                        d.material = $("#filter-material").val()
                     }
                 },
-            });
-
-            // if ($('#dataTable').length) {
-            //     let url = '/report/plastic';
-            //     let rowData = [{
-            //             data: 'id',
-            //             name: 'id'
-            //         },
-            //         {
-            //             data: 'date',
-            //             name: 'date'
-            //         },
-            //         {
-            //             data: 'product',
-            //             name: 'product'
-            //         },
-            //         {
-            //             data: 'material',
-            //             name: 'material'
-            //         },
-            //         {
-            //             data: 'total',
-            //             name: 'total'
-            //         },
-            //         {
-            //             data: 'action',
-            //             name: 'action',
-            //             orderable: false,
-            //             sortable: false
-            //         },
-            //     ];
-            //     table = $("#dataTable").DataTable({
-            //         dom: 'Brtp',
-            //         searching: false,
-            //         paging: true,
-            //         responsive: false,
-            //         autoWidth: false,
-            //         bPaginate: true,
-            //         processing: true,
-            //         serverSide: true,
-            //         order: [0, 'desc'],
-            //         oLanguage: {
-            //             oPaginate: {
-            //                 sNext: '<span class="pagination-fa"><i class="fa fa-chevron-right" ></i></span>',
-            //                 sPrevious: '<span class="pagination-fa"><i class="fa fa-chevron-left" ></i></span>'
-            //             }
-            //         },
-            //         ajax: {
-            //             url: url,
-            //             data: function(d) {
-            //                 d.id = $('input[name=stock_id]').val()
-            //                 d.date = $('input[name=date]').val()
-            //                 d.product = $('select[name=products]').val()
-            //                 d.material = $('select[name=material]').val()
-            //                 d.total = $('input[name=total]').val()
-            //             },
-            //         },
-            //         columns: rowData
-            //     });
-            // }
-            $('.input-filter').on('keyup change', function() {
-                table.draw();
-            })
-            $('#print-all').click(printAll);
-
-            $('#btn-delete').on('click', function(e) {
-                e.preventDefault();
-                Swal.fire({
-                    title: 'Are you sure ?',
-                    text: "You won't be able to revert this !",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $('form#delete-plastic').submit();
-                    }
-                })
+				"columns": [
+					{
+						title : "No", width: "5%", searchable: false, orderable : false,
+						data : null, render: (data, type, full, meta) => meta.row + 1
+					},
+					{title : "Tanggal", name: "date", data : 'date'},
+					{
+						title : "Brand / Ukuran", name: "brand", data : null,
+						render : (data) => {
+							if (!data.material || !data.material.product || !data.material.product.brand) {
+								return '-'
+							}
+							return `${data.material.product.brand.name} / ${data.material.product.size}`
+						}
+					},
+					{
+						title : "Jenis", name : "type", data : null,
+						render : (data) => {
+							if (data.material) {
+								return data.material.name
+							}
+							return '-'
+						}
+					},
+					{
+						title : "Jumlah Masuk", name: "count", data : 'total',
+						render : (data) => data ? formatRupiah(data.toString()) : 0
+					},
+					// {title : "Action", searchable: false, orderable : false},
+				]
             });
 
         });
-
-        function printAll() {
-            $('#dataTable_wrapper .buttons-print').click();
-        }
-        $('.product-plastic').on('change', function() {
-            let productId = $(this).val();
+        $('.brand-plastic').on('change', function() {
+            let brandId = $(this).val();
             $.ajax({
                 type: "GET",
-                url: "{{ route('api.get_plastic.by.product_id', '') }}" + '/' + productId,
+                url: "{{ route('api.get_plastic.by.brand_id', '') }}" + '/' + brandId,
                 dataType: "json",
                 success: function(response) {
                     let html = ``;
                     html +=
-                        `<option selected="selected" disabled>-- Pilih Jenis Plastik --</option>`;
-                    response.materials.forEach(material => {
+                        `<option selected="selected" disabled>-- Pilih Jenis / Ukuran --</option>`;
+                    response.data.forEach(item => {
                         html +=
-                            `<option value="${ material.id }">${ material.name } | stock: ${material.stock}</option>`;
+                            `<option value="${ item.id }">${item.name} / ${ item.product.size }</option>`;
                     });
-                    $('#material').html(html);
+                    $('#filter-material').html(html);
                 }
             });
         });
+
+        // $('.product-plastic').on('change', function() {
+        //     let productId = $(this).val();
+        //     $.ajax({
+        //         type: "GET",
+        //         url: "{{ route('api.get_plastic.by.product_id', '') }}" + '/' + productId,
+        //         dataType: "json",
+        //         success: function(response) {
+        //             let html = ``;
+        //             html +=
+        //                 `<option selected="selected" disabled>-- Pilih Jenis Plastik --</option>`;
+        //             response.materials.forEach(material => {
+        //                 html +=
+        //                     `<option value="${ material.id }">${ material.name } | stock: ${material.stock}</option>`;
+        //             });
+        //             $('#filter-material').html(html);
+        //         }
+        //     });
+        // });
 
         $('.material-plastic').on('change', function() {
             let materialId = $(this).val();
@@ -312,7 +213,7 @@
                 dataType: "json",
                 success: function(response) {
                     let material = response.material;
-                    console.log(typeof(material.stock));
+                    // console.log(typeof(material.stock));
                     if (material != null) {
                         $('#max-label').html('Max: ' + material.stock);
                         $('#total').attr('max', material.stock);
@@ -322,5 +223,11 @@
                 }
             });
         });
+
+
+		$(document).on('submit', '#form-filter', function (e) {
+			e.preventDefault()
+			$("#main-table").DataTable().ajax.reload( null, false );
+		})
     </script>
 @endpush

@@ -3,7 +3,7 @@
   @include('components.frontend.head')
   @stack('styles')
   <body>
-      <!-- Preloader Start -->
+    <!-- Preloader Start -->
     {{-- <div id="preloader-active">
         <div class="preloader d-flex align-items-center justify-content-center me-sm-5 me-md-0">
             <img src="{{ asset('images/logo.png') }}" alt="">
