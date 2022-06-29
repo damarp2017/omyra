@@ -5,46 +5,35 @@
             height: 42px;
             border: solid 1px #b4d5ff;
         }
-
     </style>
 @endpush
 @section('content')
     <div class="box-shadow">
         <div class="col-12 shadow-lg">
             <div class="py-3">
-                <a href="{{ route('frontend.semi-finish.index') }}">
+                <a href="{{ route('frontend.plastic.index') }}">
                     <img src="{{ asset('images/icon/back.png') }}" width="18" height="18">
                 </a>
             </div>
             <div class="row justify-content-center">
-                <div class="text-header font-size-18 text-active-pink font-weight-500">Form input Barang 1/2 Jadi</div>
+                <div class="text-header font-size-18 text-active-pink font-weight-500">Form Ubah Stok Plastik</div>
             </div>
         </div>
     </div>
     <div class="bg-grey pt-23 mt-1" style="max-height: 86vh; overflow: scroll; margin-bottom: 30px">
         <div class="container-omyra" style="margin-bottom: 90px;">
-            <form action="{{ route('frontend.semi-finish.store') }}" method="POST" enctype="multipart/form-data"
+            <form action="{{ route('frontend.plastic.update', $stock->id) }}" method="POST" enctype="multipart/form-data"
                 id="form-tambah">
                 @csrf
+                @method('put')
                 <div class="form-group">
                     <label class="font-weight-500">Tanggal</label>
                     <input type="text" name="date" id="date"
                         class="datepicker form-control font-size-16 form-omyra {{ $errors->has('date') ? 'is-invalid' : '' }}"
-                        placeholder="Masukkan Tanggal Borongan" autocomplete="off">
+                        placeholder="Masukkan Tanggal Plastik Datang" autocomplete="off" value="{{ $stock->date }}">
                     @if ($errors->has('date'))
                         <span class="invalid-feedback" role="alert">
                             <p><b>{{ $errors->first('date') }}</b></p>
-                        </span>
-                    @endif
-                </div>
-                <div class="form-group">
-                    <label class="font-weight-500">Tanggal</label>
-                    <input type="text" name="unloading_date" id="unloading_date"
-                        class="datepicker form-control font-size-16 form-omyra {{ $errors->has('unloading_date') ? 'is-invalid' : '' }}"
-                        placeholder="Masukkan Tanggal Bongkar Oven" autocomplete="off">
-                    @if ($errors->has('unloading_date'))
-                        <span class="invalid-feedback" role="alert">
-                            <p><b>{{ $errors->first('unloading_date') }}</b></p>
                         </span>
                     @endif
                 </div>
@@ -54,10 +43,9 @@
                         class="select2 form-control font-size-16 form-omyra brand-plastic {{ $errors->has('brand') ? 'is-invalid' : '' }}"
                         id="filter-brand" name="brand">
                         <option selected disabled>-- Pilih Brand --</option>
-                        @foreach ($brands as $brand)
-                            <option value="{{ $brand->id }}">
-                                {{ $brand->name }}
-                            </option>
+                        @foreach ($brands as $item)
+                            <option value="{{ $item->id }}"
+                                @if ($item->id == $stock->material->product->brand_id) {{ 'selected' }} @endif>{{ $item->name }}</option>
                         @endforeach
                         @if ($errors->has('brand'))
                             <span class="invalid-feedback" role="alert">
@@ -69,17 +57,16 @@
                 <div class="form-group">
                     <label class="font-weight-500">Jenis / Ukuran </label>
                     <select
-                        class="select2 form-control font-size-16 form-omyra product-plastic material-show {{ $errors->has('product') ? 'is-invalid' : '' }}"
+                        class="select2 form-control font-size-16 form-omyra product-plastic {{ $errors->has('material') ? 'is-invalid' : '' }}"
                         id="filter-material" name="material">
                         <option selected disabled>-- Pilih Brand Dulu --</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="font-weight-500">Total</label>
-                    <div id="max-label" class="text-danger font-weight-bold float-right"></div>
+                    <label class="font-weight-500">Jumlah Plastic</label>
                     <input type="number" name="total" id="total"
                         class="form-control font-size-16 form-omyra {{ $errors->has('total') ? 'is-invalid' : '' }}"
-                        placeholder="12.000">
+                        placeholder="12.000" {{ $stock->total }}>
                     @if ($errors->has('total'))
                         <span class="invalid-feedback" role="alert">
                             <p><b>{{ $errors->first('total') }}</b></p>
@@ -87,8 +74,7 @@
                     @endif
                 </div>
                 <button class="btn btn-omyra btn-block btn-pink text-white" type="submit">Simpan</button>
-                <a class="btn btn-outline-secondary btn-block"
-                    href="{{ route('frontend.semi-finish.index') }}">Kembali</a>
+                <a class="btn btn-outline-secondary btn-block" href="{{ route('frontend.plastic.index') }}">Kembali</a>
             </form>
         </div>
     </div>
@@ -96,13 +82,68 @@
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.4/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.4/additional-methods.min.js"></script>
+    <script src="{{ asset('assets/lib/jquery/jquery.maskMoney.min.js') }}"></script>
     <script>
-        jQuery.extend(jQuery.validator.messages, {
-            max: jQuery.validator.format("Maksimal {0}."),
-        });
-    </script>
-    <script>
+        // $(document).ready(function() {
+        //     let date = @json(Illuminate\Support\Carbon::parse($stock->date)->format('d/m/Y'));
+        //     let brandId = @json($stock->brand);
+        //     let materialId = @json($stock->material);
+        //     const url = "{{ route('api.get_plastic.by.material_id', '') }}" + '/' + brandId
+        //     $.ajax({
+        //         url: url,
+        //         // type: "post",
+        //         data: {
+        //             brand: brandId,
+        //         },
+        //         success: function(res) {
+        //             let opt = `<option selected disabled>Pilih Jenis</option>`
+        //             res.data.forEach(item => {
+        //                 if (materialId == item.id) {
+        //                     opt +=
+        //                         `<option value=${item.id} selected>${item.name} / ${item.product.size}</option>`
+        //                 } else {
+        //                     opt += `<option value=${item.id}>${item.name}</option>`
+        //                 }
+        //             })
+        //             $('#filter-material').html(opt)
+        //         },
+        //         error: function(jqXHR, textStatus, errorThrown) {
+        //             console.log(textStatus, errorThrown);
+        //         }
+        //     });
+        //     $(".datepicker").datepicker("setDate", date);
+        // });
+
+        // $(document).on('change', '#filter-brand', function(e) {
+        //     e.preventDefault()
+        //     const id = $(this).val()
+        //     const url ="{{ route('api.get_plastic.by.material_id', '') }}" + '/' + brandId
+        //     $.ajax({
+        //         url: url,
+        //         // type: "post",
+        //         data: {
+        //             brand: id,
+        //         },
+        //         success: function(res) {
+        //             let opt = `<option selected disabled>Pilih Jenis</option>`
+        //             res.data.forEach(item => {
+        //                 opt += `<option value=${item.id}>${item.name}</option>`
+        //             })
+        //             $('#filter-material').html(opt)
+        //         },
+        //         error: function(jqXHR, textStatus, errorThrown) {
+        //             console.log(textStatus, errorThrown);
+        //         }
+        //     });
+        //     //
+        // })
         $(function() {
+            $("#moneyInput, #money_input, .currency_input, .money").maskMoney({
+                thousands: '.',
+                decimal: ',',
+                affixesStay: false,
+                precision: 0
+            });
             $('.datepicker').datepicker({
                 autoclose: true,
                 format: 'dd-mm-yyyy'
@@ -113,16 +154,10 @@
                     date: {
                         required: true,
                     },
-                    unloading_date: {
-                        required: true,
-                    },
                     product: {
                         required: true,
                     },
                     material: {
-                        required: true,
-                    },
-                    need_plastic: {
                         required: true,
                     },
                     total: {
@@ -131,19 +166,13 @@
                 },
                 messages: {
                     date: {
-                        required: "Mohon masukan tanggal borongan",
-                    },
-                    unloading_date: {
-                        required: "Mohon masukan tanggal bongkar oven",
+                        required: "Mohon pilih Tanggal",
                     },
                     product: {
                         required: "Mohon pilih brand / ukuran",
                     },
                     material: {
-                        required: "Mohon pilih material plastic",
-                    },
-                    need_plastic: {
-                        required: "Mohon masukan jumlah plastic yang dibutuhkan",
+                        required: "Mohon pilih jenis master",
                     },
                     total: {
                         required: "Mohon masukan total",
@@ -161,6 +190,7 @@
                     $(element).removeClass('is-invalid');
                 }
             });
+
             $('.brand-plastic').on('change', function() {
                 let brandId = $(this).val();
                 $.ajax({
@@ -189,34 +219,15 @@
             //         success: function(response) {
             //             let html = ``;
             //             html +=
-            //                 `<option selected="selected" disabled>-- Pilih Jenis Plastik --</option>`;
+            //                 `<option selected="selected" disabled>-- Pilih Jenis Plastic --</option>`;
             //             response.materials.forEach(material => {
             //                 html +=
-            //                     `<option value="${ material.id }">${ material.name } | stock: ${material.stock}</option>`;
+            //                     `<option value="${ material.id }">${ material.name }</option>`;
             //             });
             //             $('#material').html(html);
             //         }
             //     });
             // });
-
-            $('.material-show').on('change', function() {
-                let materialId = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('api.show.material', '') }}" + '/' + materialId,
-                    dataType: "json",
-                    success: function(response) {
-                        let material = response.material;
-                        console.log(typeof(material.stock));
-                        if (material != null) {
-                            $('#max-label').html('Stok Plastik: ' + material.stock);
-                            $('#total').attr('max', material.stock);
-                        } else {
-                            $('#max-label').html('');
-                        }
-                    }
-                });
-            });
-        });
+        })
     </script>
 @endpush

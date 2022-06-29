@@ -70,7 +70,7 @@
                 <div class="form-group">
                     <label class="font-weight-500">Jenis / Ukuran </label>
                     <select
-                        class="select2 form-control font-size-16 form-omyra product-plastic {{ $errors->has('product') ? 'is-invalid' : '' }}"
+                        class="select2 form-control font-size-16 form-omyra product-plastic material-show {{ $errors->has('product') ? 'is-invalid' : '' }}"
                         id="filter-material" name="product">
                         <option selected disabled>-- Pilih Brand Dulu --</option>
                     </select>
@@ -83,9 +83,15 @@
                         <option selected="selected" disabled>-- Pilih Ukuran Dulu --</option>
                     </select>
                 </div> --}}
-                <button class="btn btn-sm btn-info float-right" type="submit">Submit</button>
-                {{-- <a class="btn btn-sm btn-outline-secondary reset-btn" href="#">Reset</a> --}}
+                <button class="btn btn-sm btn-info float-right mb-3" type="submit">Submit</button>
+                <button type="reset" class="btn btn-sm btn-outline-secondary btn-reset mb-3">Reset</button>
             </form>
+            <hr>
+            <div class="row justify-content-center mb-2">
+                <div class="col-auto">
+                    <div id="max-label" class="text-red px-2 font-30px font-weight-bold border border-danger"></div>
+                </div>
+            </div>
             {{-- <h5 class="py-3"></h5> --}}
             {{-- <hr>
             <div class="py-3 d-flex justify-content-center">
@@ -98,7 +104,7 @@
                     Print
                 </button>
             </div> --}}
-            <table id="main-table" class="table table-striped table-bordered" style="width:100%"></table>
+            <table id="main-table" class="table table-striped table-bordered table-responsive" style="width:100%"></table>
         </div>
     </div>
 @endsection
@@ -135,19 +141,19 @@
 					},
 					{title : "Tanggal", name: "date", data : 'date'},
 					{
-						title : "Brand / Ukuran", name: "brand", data : null,
+						title : "Brand", name: "brand", data : null,
 						render : (data) => {
 							if (!data.material || !data.material.product || !data.material.product.brand) {
 								return '-'
 							}
-							return `${data.material.product.brand.name} / ${data.material.product.size}`
+							return `${data.material.product.brand.name}`
 						}
 					},
 					{
-						title : "Jenis", name : "type", data : null,
+						title : "Jenis / Ukuran", name : "type", data : null,
 						render : (data) => {
 							if (data.material) {
-								return data.material.name
+								return `${data.material.name} / ${data.material.product.size}`
 							}
 							return '-'
 						}
@@ -156,10 +162,25 @@
 						title : "Jumlah Masuk", name: "count", data : 'total',
 						render : (data) => data ? formatRupiah(data.toString()) : 0
 					},
+                    // {
+						// title : "Sisa Stok", name : "stock", data : null,
+                        // render : (data) => data ? formatRupiah(data.material.stock.toString()) : 0
+						// render : (data) => {
+						// 	if (data.material) {
+						// 		return  ` ${data.material.stock}`
+						// 	}
+						// 	return '-'
+						// }
+					// },
 					// {title : "Action", searchable: false, orderable : false},
 				]
             });
-
+            $(document).on('click', '.btn-reset', function(e) {
+                e.preventDefault()
+                $('#filter-brand').val('')
+                $('#filter-material').val('')
+                table.ajax.reload()
+            })
         });
 
         $('.brand-master').on('change', function() {
@@ -200,7 +221,7 @@
         //     });
         // });
 
-        $('.material-master').on('change', function() {
+        $('.material-show').on('change', function() {
             let materialId = $(this).val();
             $.ajax({
                 type: "GET",
@@ -210,8 +231,8 @@
                     let material = response.material;
                     // console.log(typeof(material.stock));
                     if (material != null) {
-                        $('#max-label').html('Max: ' + material.stock);
-                        $('#total').attr('max', material.stock);
+                        $('#max-label').html(material ? 'Sisa stok: ' +  formatRupiah(material.stock.toString()) : 0);
+                        // $('#total').attr('max', material.stock);
                     } else {
                         $('#max-label').html('');
                     }

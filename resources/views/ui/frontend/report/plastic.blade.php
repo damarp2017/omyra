@@ -49,7 +49,7 @@
     <div class="bg-grey pt-23 mt-1" style="max-height: 86vh; overflow: scroll;">
         {{-- @include('components.frontend.flashmessage') --}}
         <div class="container-omyra" style="margin-bottom: 90px;">
-            <form action="#" method="POST" enctype="multipart/form-data" id="form-filter">
+            <form action="#" method="POST" enctype="multipart/form-data" class="myform" id="form-filter">
                 @csrf
                 <div class="form-group">
                     <label class="font-weight-500">Brand</label>
@@ -72,7 +72,7 @@
                 <div class="form-group">
                     <label class="font-weight-500">Jenis / Ukuran </label>
                     <select
-                        class="select2 form-control font-size-16 form-omyra product-plastic {{ $errors->has('product') ? 'is-invalid' : '' }}"
+                        class="select2 form-control font-size-16 form-omyra product-plastic material-show {{ $errors->has('product') ? 'is-invalid' : '' }}"
                         id="filter-material" name="product">
                         <option selected disabled>-- Pilih Brand Dulu --</option>
                     </select>
@@ -85,9 +85,16 @@
                         <option selected="selected" disabled>-- Pilih Ukuran Dulu --</option>
                     </select>
                 </div> --}}
-                <button class="btn btn-sm btn-info float-right mb-5" type="submit">Submit</button>
-                {{-- <a class="btn btn-sm btn-outline-secondary reset-btn" href="#">Reset</a> --}}
+                <button class="btn btn-sm btn-info float-right mb-3" type="submit">Submit</button>
+                <button type="reset" class="btn btn-sm btn-outline-secondary btn-reset mb-3">Reset</button>
             </form>
+
+            <hr>
+            <div class="row justify-content-center mb-2">
+                <div class="col-auto">
+                    <div id="max-label" class="text-red px-2 font-30px font-weight-bold border border-danger"></div>
+                </div>
+            </div>
             {{-- <h5 class="py-3"></h5> --}}
             {{-- <hr>
             <div class="py-3 d-flex justify-content-center">
@@ -100,7 +107,7 @@
                     Print
                 </button>
             </div> --}}
-            <table id="main-table" class="table table-striped table-bordered" style="width:100%"></table>
+            <table id="main-table" class="table table-striped table-bordered table-responsive" style="width:100%"></table>
         </div>
     </div>
 @endsection
@@ -120,13 +127,15 @@
 
 
             const table = $('#main-table').DataTable({
-				"destroy": true,
-				"pageLength": 10,
-				"processing": true,
-				"serverSide": true,
+                "destroy": true,
+                "pageLength": 10,
+                "processing": true,
+                "serverSide": true,
                 "ajax": {
                     url: "{{ url('') }}/report/plastic/data",
-					headers: { 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN
+                    },
                     type: "post",
                     data: function(d) {
                         d.brand = $("#filter-brand").val()
@@ -134,37 +143,70 @@
                         d.material = $("#filter-material").val()
                     }
                 },
-				"columns": [
-					{
-						title : "No", width: "5%", searchable: false, orderable : false,
-						data : null, render: (data, type, full, meta) => meta.row + 1
-					},
-					{title : "Tanggal", name: "date", data : 'date'},
-					{
-						title : "Brand / Ukuran", name: "brand", data : null,
-						render : (data) => {
-							if (!data.material || !data.material.product || !data.material.product.brand) {
-								return '-'
-							}
-							return `${data.material.product.brand.name} / ${data.material.product.size}`
-						}
-					},
-					{
-						title : "Jenis", name : "type", data : null,
-						render : (data) => {
-							if (data.material) {
-								return data.material.name
-							}
-							return '-'
-						}
-					},
-					{
-						title : "Jumlah Masuk", name: "count", data : 'total',
-						render : (data) => data ? formatRupiah(data.toString()) : 0
-					},
-					// {title : "Action", searchable: false, orderable : false},
-				]
+                "columns": [{
+                        title: "No",
+                        width: "5%",
+                        searchable: false,
+                        orderable: false,
+                        data: null,
+                        render: (data, type, full, meta) => meta.row + 1
+                    },
+                    {
+                        title: "Tanggal",
+                        name: "date",
+                        data: 'date'
+                    },
+                    {
+                        title: "Brand",
+                        name: "brand",
+                        data: null,
+                        render: (data) => {
+                            if (!data.material || !data.material.product || !data.material.product
+                                .brand) {
+                                return '-'
+                            }
+                            return `${data.material.product.brand.name}`
+                        }
+                    },
+                    {
+                        title: "Jenis / Ukuran",
+                        name: "type",
+                        data: null,
+                        render: (data) => {
+                            if (data.material) {
+                                return `${data.material.name} / ${data.material.product.size}`
+                            }
+                            return '-'
+                        }
+                    },
+                    {
+                        title: "Jumlah Masuk",
+                        name: "count",
+                        data: 'total',
+                        render: (data) => data ? formatRupiah(data.toString()) : 0
+                    },
+                    // {
+                    //     title: "Sisa Stok",
+                    //     name: "stock",
+                    //     data: null,
+                    //     render: (data) => data ? formatRupiah(data.material.stock.toString()) : 0
+                        // render : (data) => {
+                        // 	if (data.material) {
+                        // 		return  formatRupiah( data.material.stock.toString()) : 0
+                        // 	}
+                        // 	return '-'
+                        // }
+                    // },
+                    // {title : "Action", searchable: false, orderable : false},
+                ]
             });
+
+            $(document).on('click', '.btn-reset', function(e) {
+                e.preventDefault()
+                $('#filter-brand').val('')
+                $('#filter-material').val('')
+                table.ajax.reload()
+            })
 
         });
         $('.brand-plastic').on('change', function() {
@@ -205,7 +247,7 @@
         //     });
         // });
 
-        $('.material-plastic').on('change', function() {
+        $('.material-show').on('change', function() {
             let materialId = $(this).val();
             $.ajax({
                 type: "GET",
@@ -215,8 +257,8 @@
                     let material = response.material;
                     // console.log(typeof(material.stock));
                     if (material != null) {
-                        $('#max-label').html('Max: ' + material.stock);
-                        $('#total').attr('max', material.stock);
+                        $('#max-label').html(material ? 'Sisa stok: ' +  formatRupiah(material.stock.toString()) : 0);
+                        // $('#total').attr('max', material.stock);
                     } else {
                         $('#max-label').html('');
                     }
@@ -225,9 +267,9 @@
         });
 
 
-		$(document).on('submit', '#form-filter', function (e) {
-			e.preventDefault()
-			$("#main-table").DataTable().ajax.reload( null, false );
-		})
+        $(document).on('submit', '#form-filter', function(e) {
+            e.preventDefault()
+            $("#main-table").DataTable().ajax.reload(null, false);
+        })
     </script>
 @endpush
